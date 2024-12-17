@@ -8,9 +8,10 @@ correct_key = ('e73b79a0b10f8cdb6ac7dbe4c0a5e25776e1148784b86cf98f7d6719d472af69
 logins = 0
 max_tries = 3
 
-key = getpass.getpass('Enter password: ')
+
 
 while logins < max_tries:
+    key = getpass.getpass('Enter password: ')
     if get_hashed_text(key) == correct_key:
         print('Access granted!')
         break
@@ -136,8 +137,6 @@ def A1_telnet(ip_address, username_telnet, password_telnet, password_enable):
         print('--- Failed to create session for: ', ip_address)
         exit()
 
-
-
 #sends the username of the telnet session
     session.sendline(username_telnet)
     result = session.expect(['Password:', pexpect.TIMEOUT, pexpect.EOF])
@@ -146,8 +145,6 @@ def A1_telnet(ip_address, username_telnet, password_telnet, password_enable):
     if result != 0:
         print('--- Failed to enter username: ', username_telnet)
         exit()
-
-
 
 #sends the telnet password
     session.sendline(password_telnet)
@@ -159,8 +156,6 @@ def A1_telnet(ip_address, username_telnet, password_telnet, password_enable):
     else:
         print('--- Failed to enter password: ', password_telnet)
         exit()
-    
-
 
     #sends the enable to command to entere enable mode 
     session.sendline('enable')
@@ -223,7 +218,11 @@ def A1_telnet(ip_address, username_telnet, password_telnet, password_enable):
 #exits config mode so we can easily enter "show runningconfig"
     session.sendline('exit')
 
-
+#=-------------=
+#
+#      A2
+#
+#=-------------=
 
     session.sendline('show running-config')
     session.expect('#', timeout=30)
@@ -237,11 +236,7 @@ def A1_telnet(ip_address, username_telnet, password_telnet, password_enable):
     print("Session ended")
     return
 
-#=-------------=
-#
-#      A2
-#
-#=-------------=
+
 
 def A2_hardening_checks(ip_address,username,password_ssh):
    
@@ -504,7 +499,8 @@ def A3_configure_acl(ip_address, username, password_ssh, password_enable):
 
     print ("Successfully configured ACL")
    
-    session.sendline("exit")
+    session.sendline("end")
+
     result = session.expect(['BEN#', pexpect.TIMEOUT, pexpect.EOF], timeout=20)
 
 #Error Checks
@@ -634,7 +630,7 @@ def A3_configure_ipsec(ip_address, username, password_ssh):
 
 #setting up a new access control list
     session.sendline('ip access-list extended my_acl')
-    result = session.expect([r'\(config\)#', pexpect.TIMEOUT, pexpect.EOF])
+    result = session.expect([r'\(config-ext-nacl\)#', pexpect.TIMEOUT, pexpect.EOF])
         #Error Checks
         
     if result != 0:
@@ -814,7 +810,7 @@ def main():
         elif choice == "5":
             A3_configure_acl(ip_address, username, password_ssh, password_enable)
         elif choice == "6":
-           A3_configure_ipsec(ip_address, username, password_ssh, password_enable)
+           A3_configure_ipsec(ip_address, username, password_ssh)
         elif choice == "x":
             print("Exiting... Goodbye!")
             break
